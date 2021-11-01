@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Agent.Zorge.Moq
 {
+    /// <summary>
+    /// Suggest lambdas for Callback() and Returns()
+    /// </summary>
     [ExportCompletionProvider(nameof(MoqCallbackCompletionProvider), LanguageNames.CSharp)]
     public class MoqCallbackCompletionProvider : CompletionProvider
     {

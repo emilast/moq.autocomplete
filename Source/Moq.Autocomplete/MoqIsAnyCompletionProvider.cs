@@ -1,4 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Completion;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -8,11 +8,18 @@ using System.Threading.Tasks;
 
 namespace Agent.Zorge.Moq
 {
+    /// <summary>
+    /// Suggest It.IsAny<T> for every argument in a Setup method
+    ///
+    /// mock.Setup(m => m.Do());
+    /// ==> 
+    /// mock.Setup(m => m.Do(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
+    /// </summary>
     [ExportCompletionProvider(nameof(MoqIsAnyCompletionProvider), LanguageNames.CSharp)]
     public class MoqIsAnyCompletionProvider : CompletionProvider
     {
-        private CompletionItemRules _standardCompletionRules;
-        private CompletionItemRules _preselectCompletionRules;
+        private readonly CompletionItemRules _standardCompletionRules;
+        private readonly CompletionItemRules _preselectCompletionRules;
 
         public MoqIsAnyCompletionProvider()
         {
@@ -52,6 +59,7 @@ namespace Agent.Zorge.Moq
                             // Generate It.IsAny<>() for the whole signature if we are within first argument
                             var fullMethodHelper = string.Join(", ", matchingMockedMethodSymbol.Parameters.Select(p => "It.IsAny<" + p.Type.ToMinimalDisplayString(semanticModel, mockedMethodArgumentList.SpanStart) + ">()"));
                             context.AddItem(CompletionItem.Create(fullMethodHelper, rules: _preselectCompletionRules));
+
                             // There are more than one argument so suggest completion for first argument only too
                             if (matchingMockedMethodSymbol.Parameters.Length > 1)
                             {

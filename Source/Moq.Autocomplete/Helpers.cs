@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
@@ -9,10 +10,13 @@ namespace Agent.Zorge.Moq
 {
     internal class Helpers
     {
-        private static Regex setupMethodNamePattern = new Regex("^Moq\\.Mock<.*>\\.Setup\\.*");
+        private static readonly Regex setupMethodNamePattern = new Regex("^Moq\\.Mock<.*>\\.Setup\\.*");
 
         internal static bool IsMoqSetupMethod(SemanticModel semanticModel, InvocationExpressionSyntax invocation)
         {
+            if (invocation == null)
+                return false;
+
             var method = invocation.Expression as MemberAccessExpressionSyntax;
             return IsMoqSetupMethod(semanticModel, method);
         }
@@ -53,6 +57,11 @@ namespace Agent.Zorge.Moq
 
         internal static bool IsCallbackOrReturnInvocation(SemanticModel semanticModel, InvocationExpressionSyntax callbackOrReturnsInvocation)
         {
+            if (callbackOrReturnsInvocation == null)
+            {
+                return false;
+            }
+
             var callbackOrReturnsMethod = callbackOrReturnsInvocation.Expression as MemberAccessExpressionSyntax;
             var methodName = callbackOrReturnsMethod?.Name.ToString();
             // First fast check before walking semantic model
@@ -92,7 +101,10 @@ namespace Agent.Zorge.Moq
 
         internal static IEnumerable<IMethodSymbol> GetAllMatchingMockedMethodSymbolsFromSetupMethodInvocation(SemanticModel semanticModel, InvocationExpressionSyntax setupMethodInvocation)
         {
-            var setupLambdaArgument = setupMethodInvocation?.ArgumentList.Arguments[0]?.Expression as LambdaExpressionSyntax;
+            if (setupMethodInvocation == null) 
+                return Array.Empty<IMethodSymbol>(); // TODO Verify
+
+            var setupLambdaArgument = setupMethodInvocation.ArgumentList.Arguments[0]?.Expression as LambdaExpressionSyntax;
             var mockedMethodInvocation = setupLambdaArgument?.Body as InvocationExpressionSyntax;
 
             return GetAllMatchingSymbols<IMethodSymbol>(semanticModel, mockedMethodInvocation);

@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace Agent.Zorge.Moq
 {
+    /// <summary>
+    /// Completion for constructors etc.
+    /// Suggest using existing mock's Object property for a parameter.
+    /// </summary>
     [ExportCompletionProvider(nameof(MoqSuggestMocksForArguments), LanguageNames.CSharp)]
     public class MoqSuggestMocksForArguments : CompletionProvider
     {
@@ -45,6 +49,8 @@ namespace Agent.Zorge.Moq
                 var matchingSymbols = new HashSet<ISymbol>();
 
                 var symbols = semanticModel.LookupSymbols(context.Position);
+
+                // Suggest any existing mocks that math the argument
                 foreach (var symbol in symbols)
                 {
                     INamedTypeSymbol symbolType;

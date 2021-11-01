@@ -5,7 +5,7 @@
         <DisplayName>Moq.Autocomplete</DisplayName>
         <Description xml:space="preserve">Visual Studio extension that provides helpful autocomplets when using Moq mocking library. Port of Resharper extension to Roslyn.</Description>
         <MoreInfo>https://github.com/Litee/moq.autocomplete</MoreInfo>
-        <License>LICENSE</License>
+        <License>LICENSE.txt</License>
         <Tags>moq, mock, test</Tags>
     </Metadata>
     <Installation>
